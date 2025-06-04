@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>조별 주제 배정</title>
+    <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.8/dist/web/static/pretendard.css" />
+    <link rel="stylesheet" href="topic_styles.css">
+</head>
+<body>
+    <div class="container">
+        <div class="topics-list" id="topicsList">
+            <h2>토론 주제 목록</h2>
+            <ol>
+                <li>어떤 학습이 더 효과적일까요? 개념부터 배우기 vs 바로 프로젝트 만들어보기</li>
+                <li>ChatGPT, Cursor 시대에 개발자는 필요할까?</li>
+                <li>면접에서 '왜 개발자가 되려고 하세요?'라는 질문의 최적 답변은?</li>
+                <li>나만의 서비스를 만드는 꿈을 실현하는데 필요한 준비는 어떤게 있을까요?</li>
+                <li>초격차캠프 과정에서 꼭 가져가야할 것 3가지</li>
+                <li>개발자를 준비하는데 있어서 '실패 경험'이 중요한 이유는?</li>
+                <li>프로젝트를 만들 때 가장 중요한 것은?</li>
+                <li>코딩 공부는 독학 vs 부트캠프 어느 쪽이 더 효율적일까? 효율적인 공부법?</li>
+            </ol>
+        </div>
+        <div class="controls">
+            <button id="showTopicBtn">주제 배정 시작하기</button>
+            <button id="showResultBtn" style="display: none;">결과 보기</button>
+        </div>
+        <div class="paper-wrapper" id="paperWrapper">
+            <div class="paper" id="paper">
+                <p id="topic">여기에 주제가 표시됩니다.</p>
+            </div>
+        </div>
+        <div class="result-wrapper">
+            <table id="resultTable" class="result-table">
+                <thead>
+                    <tr>
+                        <th>조</th>
+                        <th>배정된 주제</th>
+                    </tr>
+                </thead>
+                <tbody>
+                </tbody>
+            </table>
+        </div>
+        <div class="completion-message" id="completionMessage">
+            <h2>🎉 주제 배정이 완료되었습니다!</h2>
+            <p>모든 조에 주제가 성공적으로 배정되었습니다.</p>
+        </div>
+        <div class="final-results" id="finalResults">
+            <h2>✅ 조별 주제 배정 결과 ✅</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>조</th>
+                        <th>배정된 주제</th>
+                    </tr>
+                </thead>
+                <tbody id="finalResultsBody">
+                </tbody>
+            </table>
+            <button class="print-button" onclick="window.print()">조 별로 토론 시작해주세요! 20분 </button>
+        </div>
+    </div>
+
+    <script>
+        const topics = [
+            "어떤 학습이 더 효과적일까요? 개념부터 배우기 vs 바로 프로젝트 만들어보기",
+            "ChatGPT, Cursor 시대에 개발자는 필요할까?",
+            "면접에서 '왜 개발자가 되려고 하세요?'라는 질문의 최적 답변은?",
+            "나만의 서비스를 만드는 꿈을 실현하는데 필요한 준비는 어떤게 있을까요?",
+            "초격차캠프 과정에서 꼭 가져가야할 것 3가지",
+            "개발자를 준비하는데 있어서 '실패 경험'이 중요한 이유는?",
+            "프로젝트를 만들 때 가장 중요한 것은?",
+            "코딩 공부는 독학 vs 부트캠프 어느 쪽이 더 효율적일까? 효율적인 공부법?"
+        ];
+
+        let availableIndices = [...Array(topics.length).keys()];
+        const assignments = new Map();
+        let currentTeam = 1;
+        const totalTeams = 6;
+        let isAssignmentStarted = false;
+
+        const showTopicBtn = document.getElementById('showTopicBtn');
+        const showResultBtn = document.getElementById('showResultBtn');
+        const paper = document.getElementById('paper');
+        const topicElement = document.getElementById('topic');
+        const resultTable = document.getElementById('resultTable');
+        const topicsList = document.getElementById('topicsList');
+        const paperWrapper = document.getElementById('paperWrapper');
+
+        const completionMessage = document.getElementById('completionMessage');
+        const finalResults = document.getElementById('finalResults');
+        const finalResultsBody = document.getElementById('finalResultsBody');
+
+        function updateFinalResults() {
+            finalResultsBody.innerHTML = '';
+            for (let i = 1; i <= totalTeams; i++) {
+                const topic = assignments.get(i) || '-';
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${i}조</td>
+                    <td>${topic}</td>
+                `;
+                finalResultsBody.appendChild(row);
+            }
+        }
+
+        function adjustPaperSize() {
+            paper.style.width = 'auto';
+            paper.style.height = 'auto';
+            topicElement.style.width = 'auto';
+            
+            const textWidth = topicElement.offsetWidth;
+            const textHeight = topicElement.offsetHeight;
+            
+            const finalWidth = textWidth + 40;
+            const finalHeight = textHeight + 40;
+            
+            const minWidth = 180;
+            const minHeight = 80;
+            
+            paper.style.width = Math.max(finalWidth, minWidth) + 'px';
+            paper.style.height = Math.max(finalHeight, minHeight) + 'px';
+            topicElement.style.width = '100%';
+        }
+
+        function updateResultTable() {
+            const tbody = resultTable.querySelector('tbody');
+            tbody.innerHTML = '';
+            
+            for (let i = 1; i <= totalTeams; i++) {
+                const topic = assignments.get(i) || '-';
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${i}조</td>
+                    <td>${topic}</td>
+                `;
+                tbody.appendChild(row);
+            }
+        }
+
+        showTopicBtn.addEventListener('click', function () {
+            if (!isAssignmentStarted) {
+                isAssignmentStarted = true;
+                topicsList.classList.add('hide');
+                paperWrapper.style.display = 'inline-flex';
+                showTopicBtn.textContent = '주제 뽑기';
+                return;
+            }
+
+            paper.classList.remove('show');
+            
+            if (currentTeam > totalTeams) {
+                completionMessage.style.display = 'block';
+                showResultBtn.click(); // 자동으로 결과 보기 실행
+                return;
+            }
+
+            setTimeout(() => {
+                const randomIndex = Math.floor(Math.random() * availableIndices.length);
+                const selectedIndex = availableIndices[randomIndex];
+                availableIndices.splice(randomIndex, 1);
+
+                const selectedTopic = topics[selectedIndex];
+                assignments.set(currentTeam, selectedTopic);
+                topicElement.textContent = `${currentTeam}조 주제: ${selectedTopic}`;
+                
+                adjustPaperSize();
+                paper.classList.add('show');
+                
+                currentTeam++;
+                
+                if (currentTeam > totalTeams) {
+                    showTopicBtn.style.display = 'none';
+                    showResultBtn.style.display = 'inline-block';
+                }
+                
+                updateResultTable();
+            }, 300);
+        });
+
+        showResultBtn.addEventListener('click', function() {
+            resultTable.classList.add('show');
+            paperWrapper.style.display = 'none';
+            this.style.display = 'none';
+
+            updateFinalResults();
+            finalResults.style.display = 'block';
+        });
+
+        // 초기 설정
+        adjustPaperSize();
+        completionMessage.style.display = 'none';
+        finalResults.style.display = 'none';
+        paperWrapper.style.display = 'none';
+        resultTable.style.display = 'none';
+        
+        // 결과 테이블 초기화
+        updateResultTable();
+    </script>
+</body>
+</html>

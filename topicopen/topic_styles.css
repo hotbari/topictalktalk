@@ -1,0 +1,347 @@
+/* 기본 스타일 */
+body {
+    font-family: 'Pretendard Variable', Pretendard, -apple-system, BlinkMacSystemFont, system-ui, Roboto, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background: linear-gradient(135deg, #f6f9fc 0%, #eef2f7 100%);
+    padding: 20px;
+}
+
+.container {
+    text-align: center;
+    max-width: 800px;
+    width: 100%;
+    perspective: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+/* 버튼 스타일 */
+button {
+    padding: 15px 30px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    background: linear-gradient(to right, #4a90e2, #357abd);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(74, 144, 226, 0.2);
+    position: relative;
+    overflow: hidden;
+    letter-spacing: -0.02em;
+}
+
+button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(74, 144, 226, 0.3);
+}
+
+button:active {
+    transform: translateY(1px);
+}
+
+/* 토픽 리스트 스타일 */
+.topics-list {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    margin-bottom: 30px;
+    max-width: 600px;
+    margin-left: auto;
+    margin-right: auto;
+    transition: all 0.5s ease;
+}
+
+.topics-list.hide {
+    display: none;
+}
+
+.topics-list h2 {
+    color: #34495e;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.topics-list ol {
+    text-align: left;
+    padding-left: 30px;
+    margin: 0;
+}
+
+.topics-list li {
+    color: #34495e;
+    font-size: 16px;
+    line-height: 1.6;
+    margin-bottom: 12px;
+    padding-left: 10px;
+}
+
+.topics-list li:last-child {
+    margin-bottom: 0;
+}
+
+/* 종이 효과 스타일 */
+.paper-wrapper {
+    position: relative;
+    display: inline-flex;
+    margin-top: 20px;
+    width: 100%;
+    justify-content: center;
+    display: none;
+}
+
+.paper {
+    background: #fff;
+    padding: 20px;
+    border-radius: 4px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    position: relative;
+    opacity: 0;
+    transform-origin: center;
+    transform-style: preserve-3d;
+    transform: scale(0.1) rotateX(-180deg);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+    min-width: 50px;
+    min-height: 30px;
+    background-image: linear-gradient(#eee .1em, transparent .1em);
+    background-size: 100% 1.2em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    max-width: 600px;
+}
+
+.paper.show {
+    opacity: 1;
+    transform: scale(1) rotateX(0);
+}
+
+.paper p {
+    margin: 0;
+    padding: 10px;
+    font-size: 18px;
+    line-height: 1.4;
+    color: #34495e;
+    font-weight: 500;
+    letter-spacing: -0.03em;
+    word-break: keep-all;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease 0.3s;
+    text-align: center;
+    width: 100%;
+}
+
+.paper.show p {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 결과 테이블 스타일 */
+.result-wrapper {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+}
+
+.result-table {
+    width: 100%;
+    max-width: 600px;
+    margin: 30px auto 0;
+    border-collapse: collapse;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    border-radius: 8px;
+    overflow: hidden;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: all 0.5s ease;
+    display: none;
+}
+
+.result-table.show {
+    opacity: 1;
+    transform: translateY(0);
+    display: table;
+}
+
+.result-table th, .result-table td {
+    padding: 12px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.result-table th {
+    background: #4a90e2;
+    color: white;
+    font-weight: 600;
+}
+
+.result-table tr:last-child td {
+    border-bottom: none;
+}
+
+/* 컨트롤 스타일 */
+.controls {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+/* 완료 메시지 스타일 */
+.completion-message {
+    background: #4a90e2;
+    color: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    display: none;
+    animation: slideDown 0.5s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        transform: translateY(-20px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+/* 최종 결과 스타일 */
+.final-results {
+    background: white;
+    border-radius: 12px;
+    padding: 30px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    margin: 30px auto;
+    width: 100%;
+    max-width: 600px;
+    text-align: center;
+    display: none;
+}
+
+.final-results h2 {
+    color: #34495e;
+    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.final-results table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px auto;
+    text-align: center;
+}
+
+.final-results th, .final-results td {
+    padding: 15px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+.final-results th {
+    background: #f8f9fa;
+    color: #34495e;
+    font-weight: 600;
+}
+
+.final-results tr:last-child td {
+    border-bottom: none;
+}
+
+.print-button {
+    margin-top: 20px;
+    background: #4a90e2;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.print-button:hover {
+    background: #357abd;
+}
+
+/* 반응형 스타일 */
+@media print {
+    body {
+        background: white;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 100%;
+    }
+
+    .final-results {
+        box-shadow: none;
+        padding: 0;
+    }
+
+    .print-button {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .container {
+        padding: 0 20px;
+    }
+    
+    button {
+        padding: 12px 24px;
+        font-size: 16px;
+    }
+    
+    .paper {
+        padding: 15px;
+    }
+    
+    .paper p {
+        font-size: 16px;
+    }
+
+    .result-table th, .result-table td {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .topics-list {
+        padding: 20px;
+    }
+
+    .topics-list h2 {
+        font-size: 20px;
+    }
+
+    .topics-list li {
+        font-size: 14px;
+    }
+
+    .final-results {
+        padding: 20px;
+    }
+
+    .final-results th, .final-results td {
+        padding: 10px;
+        font-size: 14px;
+    }
+}

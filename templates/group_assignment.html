@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>10기 팀 배정 결과</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ffd6e0;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background-color: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #ff6b88;
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2em;
+        }
+
+        .group-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .group {
+            background-color: #fff5f7;
+            border-radius: 10px;
+            padding: 15px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s;
+        }
+
+        .group:hover {
+            transform: translateY(-5px);
+        }
+
+        .group-title {
+            color: #ff6b88;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            text-align: center;
+            border-bottom: 2px dashed #ffd6e0;
+            padding-bottom: 5px;
+        }
+
+        .student-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .student-list li {
+            padding: 5px 10px;
+            margin: 5px 0;
+            background-color: white;
+            border-radius: 5px;
+            text-align: center;
+            border: 1px solid #ffd6e0;
+        }
+
+        .input-section {
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        input, button {
+            padding: 8px 15px;
+            margin: 5px;
+            border: 2px solid #ff6b88;
+            border-radius: 5px;
+        }
+
+        button {
+            background-color: #ff6b88;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        button:hover {
+            background-color: #ff8da1;
+        }
+
+        .error-message {
+            color: #ff4757;
+            text-align: center;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #ffe0e3;
+            border-radius: 5px;
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎀 토픽 톡톡 팀 배정 🎀</h1>
+
+        <div class="input-section">
+            <input type="number" id="groupSize" placeholder="조당 인원 수" min="1">
+            <button onclick="assignGroups()">조 배정하기</button>
+        </div>
+
+        <div id="errorMessage" class="error-message"></div>
+
+        <div id="groupResults" class="group-container">
+        </div>
+    </div>
+
+    <script>
+        async function assignGroups() {
+            const groupSize = parseInt(document.getElementById('groupSize').value);
+            const errorMessage = document.getElementById('errorMessage');
+            const container = document.getElementById('groupResults');
+
+            if (!groupSize || groupSize < 1) {
+                errorMessage.textContent = '올바른 조당 인원 수를 입력해주세요!';
+                errorMessage.style.display = 'block';
+                return;
+            }
+
+            try {
+                const response = await fetch('/assign', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ groupSize: groupSize })
+                });
+
+                const data = await response.json();
+
+                if (data.error) {
+                    errorMessage.textContent = data.error;
+                    errorMessage.style.display = 'block';
+                    return;
+                }
+
+                errorMessage.style.display = 'none';
+                container.innerHTML = '';
+
+                data.groups.forEach((group, index) => {
+                    const groupDiv = document.createElement('div');
+                    groupDiv.className = 'group';
+
+                    const groupTitle = document.createElement('div');
+                    groupTitle.className = 'group-title';
+                    groupTitle.textContent = `${index + 1}조`;
+
+                    const studentList = document.createElement('ul');
+                    studentList.className = 'students.txt-list';
+
+                    group.forEach(student => {
+                        const li = document.createElement('li');
+                        li.textContent = student;
+                        studentList.appendChild(li);
+                    });
+
+                    groupDiv.appendChild(groupTitle);
+                    groupDiv.appendChild(studentList);
+                    container.appendChild(groupDiv);
+                });
+            } catch (error) {
+                errorMessage.textContent = '서버 오류가 발생했습니다. 다시 시도해주세요.';
+                errorMessage.style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
